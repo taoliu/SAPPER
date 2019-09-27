@@ -6,6 +6,10 @@ install:
 - python setup.py install
 script:
 - pytest
+- cd test
+- ./test.sh integrativetest
+- flag=1;for i in `ls integrativetest*.log`;do echo $i;egrep -i "error|warning" $i;let "flag&=$?";done;if [[ $flag == 0 ]];then false;fi
+- done
 deploy:
   provider: pypi
   user:

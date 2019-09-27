@@ -1,4 +1,4 @@
-# Time-stamp: <2018-05-24 15:12:18 Tao Liu>
+# Time-stamp: <2019-09-27 15:24:21 taoliu>
 
 """Description: sapper call
 
@@ -230,7 +230,7 @@ def run( args ):
                     for result in results[ i ]:
                         peak_variants.add_variant( result[0], result[1] )
 
-            t_call_variants += time() - t_call_variants_0
+                t_call_variants += time() - t_call_variants_0
 
             # Next, check if we should do local assembly
             if ( fermi == "auto" and ( peak_variants.has_indel() or peak_variants.has_refer_biased_01() ) ) or fermi == "on":
