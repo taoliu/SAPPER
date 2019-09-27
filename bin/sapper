@@ -1,18 +1,11 @@
 #!/usr/bin/env python
-# Time-stamp: <2017-09-27 15:01:11 Tao Liu>
+# Time-stamp: <2019-09-27 12:27:55 taoliu>
 
 """Description: SAPPER main executable.
 
-Copyright (c) 2016 Tao Liu, Liqing Tian
-
 This code is free software; you can redistribute it and/or modify it
-under the terms of the BSD License (see the file COPYING included with
+under the terms of the BSD License (see the file LICENSE included with
 the distribution).
-
-@status: release candidate
-@version: $Id$
-@author:  Liqing Tian, Tao Liu
-@contact: tliu4@buffalo.edu
 """
 
 # ------------------------------------
@@ -26,7 +19,7 @@ import argparse as ap
 # ------------------------------------
 # own python modules
 # ------------------------------------
-#from SAPPER.Constants import *
+from SAPPER.Constants import SAPPER_VERSION
 
 # ------------------------------------
 # Main function
@@ -59,11 +52,11 @@ def prepare_argparser ():
     function first.
     
     """
-    description = "%(prog)s -- de novo variant caller for ChIP-Seq"
+    description = "%(prog)s -- de novo variant caller for DNA enrichment assays"
     epilog = "For command line options of each command, type: %(prog)s COMMAND -h"
     # top-level parser
     argparser = ap.ArgumentParser( description = description, epilog = epilog ) #, usage = usage )
-    argparser.add_argument("--version", action="version", version="%(prog)s 1.0.0")
+    argparser.add_argument("--version", action="version", version="%(prog)s "+SAPPER_VERSION)
     subparsers = argparser.add_subparsers( dest = 'subcommand_name' ) #help="sub-command help")
     
     add_call_parser( subparsers )    
@@ -79,35 +72,43 @@ def add_call_parser( subparsers ):
     """
     argparser_call = subparsers.add_parser("call", 
                                            formatter_class = ap.RawDescriptionHelpFormatter,
-                                           help="Main SAPPER Function: Call variants from ChIP-Seq.", 
-                                           epilog = """Tips to prepare your input files from ChIP-Seq IP and CTRL BAM files:
+                                           help="Main SAPPER Function: Call variants from single DNA enrichment assay.", 
+                                           epilog = """Tips to prepare your input BAM files:
 *Note: please modify the following command lines accordingly*
 
+Assuming you have two types of BAM files. The first type, what we call
+`TREAT`, is from DNA enrichment assay such as ChIP-seq or ATAC-seq
+where the DNA fragments in the sequencing library are enriched in
+certain genomics regions with potential allele biases; the second
+type, called `CTRL` for control, is from genomic assay in which the
+DNA enrichment is less biased in multiploid chromosomes and more
+uniform across the whole genome (the later one is optional).
+
 1. Clean the BAM files:
-    $ samtools view -q 30 -F 4 -F 256 -F 2048 -b IP.bam -o IP_clean.bam
+    $ samtools view -q 30 -F 4 -F 256 -F 2048 -b TREAT.bam -o TREAT_clean.bam
     $ samtools view -q 30 -F 4 -F 256 -F 2048 -b CTRL.bam -o CTRL_clean.bam
 2. Sort the BAM file:
-    $ samtools sort  IP_clean.bam  IP_clean_sorted
+    $ samtools sort  TREAT_clean.bam  TREAT_clean_sorted
     $ samtools sort  CTRL_clean.bam  CTRL_clean_sorted
 3. Peak calling (example is for paired-end data):
-    $ macs2 callpeak -f BAMPE -t IP_clean_sort.bam -c CTRL_clean_sort.bam -n MyFactor
+    $ macs2 callpeak -f BAMPE -t TREAT_clean_sort.bam -c CTRL_clean_sort.bam -n MyFactor
 4. Sort peak file:
     $ sort -k1,1 -k2,2n MyFactor_peaks.narrowPeak > MyFactor_peaks.sorted.bed
 5. Extract reads in peak regions:
-    $ samtools view -b IP_clean_sorted.bam -L MyFactor_peaks.sorted.bed -o IP_peaks.bam
+    $ samtools view -b TREAT_clean_sorted.bam -L MyFactor_peaks.sorted.bed -o TREAT_peaks.bam
     $ samtools view -b CTRL_clean_sorted.bam -L MyFactor_peaks.sorted.bed -o CTRL_peaks.bam
 
 To run SAPPER:
-    $ sapper call -b MyFactor_peaks.sorted.bed -t IP_peaks.bam -c CTRL_peaks.bam -o MyFactor.vcf
+    $ sapper call -b MyFactor_peaks.sorted.bed -t TREAT_peaks.bam -c CTRL_peaks.bam -o MyFactor.vcf
 """)
     # group for input files
     group_input = argparser_call.add_argument_group( "Input files arguments" )
     group_input.add_argument( "-b", "--peak", dest = "peakbed", type = str, required =True,
                               help = "Peak regions in BED format, sorted by coordinates. REQUIRED." )
     group_input.add_argument( "-t", "--treatment", dest = "tfile", type = str, required = True, 
-                              help = "ChIP-seq treatment files in BAM format, containing only records in peak regions, sorted by coordinates. I. Check instruction on how to make the file using samtools. REQUIRED." )
+                              help = "ChIP-seq/ATAC-seq treatment file in BAM format, containing only records in peak regions, sorted by coordinates. Check instruction on how to make the file using samtools. REQUIRED." )
     group_input.add_argument( "-c", "--control", dest = "cfile", type = str, required = False, 
-                              help = "Control filse in BAM format, containing only records in peak regions, sorted by coordinates. Check instruction on how to make the file using samtools. ")
+                              help = "Control file in BAM format, containing only records in peak regions, sorted by coordinates. Check instruction on how to make the file using samtools. ")
     # group for output files
     group_output = argparser_call.add_argument_group( "Output arguments" )
     group_output.add_argument( "-o", "--ofile", dest = "ofile", type = str, required = True,

@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# Time-stamp: <2017-09-27 14:42:03 Tao Liu>
+# Time-stamp: <2019-09-27 11:51:43 taoliu>
 
 """Description: 
 
@@ -39,8 +39,8 @@ except:
     numpy_include_dir = [] 
 
 def main():
-    if float(sys.version[:3])<3.6 or float(sys.version[:3])>=3.7:
-        sys.stderr.write("CRITICAL: Python version must be 3.6!\n")
+    if float(sys.version[:3])<3.6:
+        sys.stderr.write("CRITICAL: Python version must be larger than 3.6!\n")
         sys.exit(1)
 
     # I intend to use -Ofast, however if gcc version < 4.6, this option is unavailable so...
@@ -60,8 +60,8 @@ def main():
                    ]
 
     setup(name="SAPPER",
-          version="1.0.1.20170928",
-          description="de novo Variant caller for ChIP-Seq",
+          version="1.0.2",
+          description="de novo variant caller for DNA enrichment assays",
           author='Tao Liu',
           author_email='tliu4@buffalo.edu',
           url='http://github.com/taoliu/SAPPER/',
