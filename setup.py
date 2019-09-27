@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# Time-stamp: <2019-09-27 11:51:43 taoliu>
+# Time-stamp: <2019-09-27 13:08:05 taoliu>
 
 """Description: 
 
@@ -25,18 +25,12 @@ from setuptools import setup, Extension
 
 # Use build_ext from Cython if found
 command_classes = {}
-try:
-    import Cython.Distutils
-    command_classes['build_ext'] = Cython.Distutils.build_ext
-    has_cython = True
-except:
-    has_cython = False
+import Cython.Distutils
+command_classes['build_ext'] = Cython.Distutils.build_ext
+from Cython.Build import cythonize
 
-try: 
-    from numpy import get_include as numpy_get_include 
-    numpy_include_dir = [numpy_get_include()] 
-except: 
-    numpy_include_dir = [] 
+from numpy import get_include as numpy_get_include 
+numpy_include_dir = [numpy_get_include()] 
 
 def main():
     if float(sys.version[:3])<3.6:
@@ -82,10 +76,10 @@ def main():
               ],
           install_requires=[
               'cython>=0.25',
-              #'scipy',
+              'numpy>=1.15'
               ],
           cmdclass = command_classes,
-          ext_modules = ext_modules
+          ext_modules = cythonize(ext_modules, language_level=3)
           )
 
 if __name__ == '__main__':

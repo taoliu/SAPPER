@@ -6,11 +6,6 @@ install:
 - python setup.py install
 script:
 - pytest
-- cd test
-- "./test.sh subcommandstest"
-- for i in `ls subcommandstest_run_*/*.log`;do echo $i;egrep -i "error|warning" $i;
-  done; [ $? == 1 ] || false
-- cd ..
 deploy:
   provider: pypi
   user:

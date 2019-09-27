@@ -1,4 +1,4 @@
-# Time-stamp: <2017-06-06 11:38:16 Tao Liu>
+# Time-stamp: <2019-09-27 13:11:55 taoliu>
 
 """Module for PeakIO IO classes.
 
@@ -35,11 +35,11 @@ __doc__ = "PeakIO class"
 # ------------------------------------
 # Misc functions
 # ------------------------------------
-cdef subpeak_letters( int i):
+cdef str subpeak_letters( int i):
     if i < 26:
         return chr(97+i)
     else:
-        return subpeak_letters(i / 26) + chr(97 + (i % 26))
+        return subpeak_letters(i // 26) + chr(97 + (i % 26))
     
 # ------------------------------------
 # Classes
